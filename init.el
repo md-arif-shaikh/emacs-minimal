@@ -30,33 +30,32 @@
   :defer t)
 (autopair-global-mode)
 
-;;; lsp
-(use-package lsp-mode
+;; elpy
+(use-package elpy
   :straight t
-  :commands lsp
+  :defer t
   :config
-  (setq lsp-enable-completion-at-point t
-	lsp-prefer-capf t) 
+  (advice-add 'python-mode :before 'elpy-enable)
+  (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
+  (flymake-mode)
+  (remove-hook 'elpy-modules 'elpy-module-flymake)
+  :hook (python-mode . linum-mode)
   )
+(defun my/python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
 
-(setq gc-cons-threshold 100000000
-      read-process-output-max (* 1024 1024)
-      treemacs-space-between-root-nodes nil
-      company-idle-delay 0.0
-      company-minimum-prefix-length 1
-      lsp-idle-delay 0.1)
+(add-hook 'python-mode-hook 'my/python-mode-hook)
 
-(use-package lsp-python-ms 
+(use-package highlight-indent-guides
   :straight t
-  :init
-  (setq
-   lsp-python-ms-auto-install-server t
-   lsp-python-ms-executable (executable-find "python-language-server"))
-  :hook
-  (python-mode . (lambda ()
-		    (require 'lsp-python-ms)
-		     (lsp-deferred)))
-  (python-mode . linum-mode))
+  :defer t
+  :config
+  (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
+  (setq highlight-indent-guides-method 'character))
+
+(use-package company-jedi
+  :straight t
+  :defer)
 
 ;;; flycheck
 
