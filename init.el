@@ -15,12 +15,6 @@
 ;;; install use-package
 (straight-use-package 'use-package)
 
-;;; install doom-theme
-(use-package doom-themes
-  :straight t
-  :config
-  (load-theme 'doom-gruvbox t))
-
 ;;; rainbow delimeters
 (use-package rainbow-delimiters
   :straight t
