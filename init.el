@@ -21,6 +21,15 @@
   :config
   (load-theme 'doom-gruvbox t))
 
+;;; rainbow delimeters
+(use-package rainbow-delimiters
+  :straight t
+  :hook
+  (prog-mode . rainbow-delimiters-mode))
+
+(show-paren-mode 1)
+(setq show-paren-style 'parenthesis)
+
 ;;; line number
 (setq linum-format "%4d \u2502 ")
 
@@ -30,19 +39,14 @@
   :defer t)
 (autopair-global-mode)
 
-;; elpy
-(use-package elpy
+;;; pyvenv
+(use-package pyvenv
   :straight t
-  :defer t
+  :defer
   :config
-  (advice-add 'python-mode :before 'elpy-enable)
-  (add-hook 'elpy-mode-hook (lambda () (highlight-indentation-mode -1)))
-  (flymake-mode)
-  (remove-hook 'elpy-modules 'elpy-module-flymake)
-  :hook (python-mode . linum-mode)
-  )
-(defun my/python-mode-hook ()
-  (add-to-list 'company-backends 'company-jedi))
+  (setenv "WORKON_HOME" "~/miniconda3/envs/")
+  (pyvenv-mode 1)
+  (pyvenv-tracking-mode 1))
 
 (add-hook 'python-mode-hook 'my/python-mode-hook)
 
@@ -53,21 +57,6 @@
   (add-hook 'prog-mode-hook 'highlight-indent-guides-mode)
   (setq highlight-indent-guides-method 'character))
 
-(use-package company-jedi
-  :straight t
-  :defer)
-
-;;; flycheck
-
-(use-package flycheck
-  :straight t
-  :config
-  (global-flycheck-mode)
-  (setq flycheck-indication-mode 'left-fringe)
-  (setq-default flycheck-disabled-checkers '(python-pylint))
-  )
-
-;;; company
 (use-package company
   :straight t
   :defer
@@ -76,18 +65,44 @@
   :config
   (setq company-dabbrev-downcase 0)
   (setq company-idle-delay 0.1)
-  (setq company-minimum-prefix-length 1)
-  (setq company-tooltip-align-annotations t)
-  )
+  (setq company-minimum-prefix-length 1))
 
-;;; magit
-(use-package magit
-  :straight t
-  :defer
-  :bind ("C-x g" . magit-status))
-
-;;; vertico
-(use-package vertico
+;;; python lsp
+(use-package lsp-python-ms
   :straight t
   :init
-  (vertico-mode))
+  (setq
+   lsp-python-ms-auto-install-server t
+   lsp-python-ms-executable (executable-find "python-language-server"))
+  :hook
+  (python-mode . (lambda ()
+		   (require 'lsp-python-ms)
+ 		   (lsp-deferred)))
+  (python-mode . linum-mode))
+
+;;; flycheck
+(use-package flycheck
+  :straight t
+  :config
+  (global-flycheck-mode)
+  (setq flycheck-indication-mode 'left-fringe)
+  (setq-default flycheck-disabled-checkers '(python-pylint))
+  )
+
+(use-package python-docstring
+  :straight t
+  :hook
+  (python-mode . python-docstring-mode))
+
+(use-package magit
+  :straight t)
+
+(use-package doom-themes
+  :straight t
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+	doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-gruvbox t))
+
+(setq-default fill-column 79)
