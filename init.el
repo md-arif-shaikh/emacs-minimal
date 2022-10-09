@@ -71,8 +71,7 @@
   :hook
   (python-mode . (lambda ()
 		   (require 'lsp-python-ms)
- 		   (lsp-deferred)))
-  (python-mode . linum-mode))
+ 		   (lsp-deferred))))
 
 ;;; flycheck
 (use-package flycheck
